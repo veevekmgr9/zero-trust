@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h2>Patient Data</h2>
-<p>Patient records will be shown here</p>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2>Patient Data</h2>
+        <p>This section will contain patient records.</p>
+        <p><strong>Logged in role:</strong> {{ role }}</p>
+    </div>
+</div>
 {% endblock %}

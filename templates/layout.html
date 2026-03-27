@@ -14,16 +14,29 @@
 
             <div>
                 <a class="btn btn-outline-light btn-sm me-2" href="/">Home</a>
-                <a class="btn btn-outline-light btn-sm me-2" href="/login">Login</a>
                 <a class="btn btn-outline-light btn-sm me-2" href="/dashboard">Dashboard</a>
                 <a class="btn btn-outline-light btn-sm me-2" href="/patient">Patient</a>
                 <a class="btn btn-outline-light btn-sm me-2" href="/device">Device</a>
-                <a class="btn btn-outline-light btn-sm" href="/logs">Logs</a>
+                <a class="btn btn-outline-light btn-sm me-2" href="/logs">Logs</a>
+
+                {% if session.get('username') %}
+                <a class="btn btn-warning btn-sm" href="/logout">Logout</a>
+                {% else %}
+                <a class="btn btn-outline-light btn-sm" href="/login">Login</a>
+                {% endif %}
             </div>
         </div>
     </nav>
 
     <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
         {% block content %}{% endblock %}
     </div>
 

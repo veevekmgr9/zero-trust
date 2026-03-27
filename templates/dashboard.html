@@ -1,6 +1,25 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h2>Dashboard</h2>
-<p>Overview of system activity</p>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2>Dashboard</h2>
+        <p><strong>User:</strong> {{ username }}</p>
+        <p><strong>Role:</strong> {{ role }}</p>
+
+        {% if role == "Admin" %}
+        <div class="alert alert-primary">
+            Admin can manage users, trusted devices, trusted IPs, and security logs.
+        </div>
+        {% elif role == "Doctor" %}
+        <div class="alert alert-success">
+            Doctor can access and update patient records based on Zero Trust verification.
+        </div>
+        {% elif role == "Nurse" %}
+        <div class="alert alert-info">
+            Nurse can access limited patient information based on Zero Trust verification.
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

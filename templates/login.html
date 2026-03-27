@@ -1,10 +1,32 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h2>Login</h2>
-<form>
-    <input class="form-control mb-2" placeholder="Username">
-    <input class="form-control mb-2" placeholder="Password">
-    <button class="btn btn-primary">Login</button>
-</form>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2>Hospital System Login</h2>
+        <p>Login to access the healthcare system.</p>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+
+        <hr>
+        <h5>Demo Accounts</h5>
+        <ul>
+            <li>Admin: <code>admin1</code> / <code>admin123</code></li>
+            <li>Doctor: <code>doctor1</code> / <code>doc123</code></li>
+            <li>Nurse: <code>nurse1</code> / <code>nurse123</code></li>
+        </ul>
+    </div>
+</div>
 {% endblock %}

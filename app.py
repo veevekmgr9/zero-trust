@@ -224,7 +224,21 @@ def dashboard():
     cursor.execute("SELECT COUNT(*) FROM security_logs WHERE attack_type!='Normal'")
     detected_attacks = cursor.fetchone()[0]
 
+     # Decision stats
+    cursor.execute("SELECT decision, COUNT(*) FROM security_logs GROUP BY decision")
+    decision_rows = cursor.fetchall()
+
+    # Attack stats
+    cursor.execute("SELECT attack_type, COUNT(*) FROM security_logs GROUP BY attack_type")
+    attack_rows = cursor.fetchall()
+
     conn.close()
+
+    decision_labels = [row[0] for row in decision_rows]
+    decision_values = [row[1] for row in decision_rows]
+
+    attack_labels = [row[0] for row in attack_rows]
+    attack_values = [row[1] for row in attack_rows]
 
     return render_template(
         "dashboard.html",
@@ -233,7 +247,11 @@ def dashboard():
         total_requests=total_requests,
         allowed_requests=allowed_requests,
         denied_requests=denied_requests,
-        detected_attacks=detected_attacks
+        detected_attacks=detected_attacks,
+        decision_labels=decision_labels,
+        decision_values=decision_values,
+        attack_labels=attack_labels,
+        attack_values=attack_values
     )
 
 
@@ -471,7 +489,7 @@ def admin():
         trusted_ips=TRUSTED_IPS,
         trusted_devices=TRUSTED_DEVICES,
         users=USERS,
-        patient=PATIENTS,
+        patients=PATIENTS,
     )
 
 if __name__ == "__main__":

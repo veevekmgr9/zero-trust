@@ -60,4 +60,50 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="row mt-4">
+
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4>Allow vs Deny</h4>
+                <canvas id="decisionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4>Attack Types</h4>
+                <canvas id="attackChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    new Chart(document.getElementById('decisionChart'), {
+        type: 'pie',
+        data: {
+            labels: {{ decision_labels| tojson }},
+        datasets: [{
+            data: {{ decision_values| tojson }}
+        }]
+    }
+});
+
+    new Chart(document.getElementById('attackChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ attack_labels| tojson }},
+        datasets: [{
+            data: {{ attack_values| tojson }}
+        }]
+    }
+});
+</script>
 {% endblock %}

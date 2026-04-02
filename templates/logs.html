@@ -32,7 +32,13 @@
                         <td>{{ log[4] }}</td>
                         <td>{{ log[5] }}</td>
                         <td>{{ log[6] }}</td>
-                        <td>{{ log[7] }}</td>
+                        <td>
+                            {% if log[7] == 'Allow' %}
+                            <span class="badge bg-success">Allow</span>
+                            {% else %}
+                            <span class="badge bg-danger">Deny</span>
+                            {% endif %}
+                        </td>
                         <td>{{ log[8] }}</td>
                     </tr>
                     {% endfor %}

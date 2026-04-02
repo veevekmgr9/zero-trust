@@ -3,9 +3,100 @@
 {% block content %}
 <div class="card shadow-sm">
     <div class="card-body">
-        <h2>Patient Data</h2>
-        <p>This section will contain patient records.</p>
+        <h2>Patient Data Access</h2>
+        <p>Every patient-data request must pass Zero Trust verification before any record is shown.</p>
+
         <p><strong>Logged in role:</strong> {{ role }}</p>
+
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Select Patient</label>
+                    <select name="patient_id" class="form-control" required>
+                        {% for patient_id, patient in patients.items() %}
+                        <option value="{{ patient_id }}">{{ patient_id }} - {{ patient.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Device Name</label>
+                    <select name="device_name" class="form-control" required>
+                        <option value="Heart Monitor">Heart Monitor</option>
+                        <option value="Wearable Sensor">Wearable Sensor</option>
+                        <option value="Nurse Tablet">Nurse Tablet</option>
+                        <option value="Admin Workstation">Admin Workstation</option>
+                        <option value="Smart Infusion Pump">Smart Infusion Pump</option>
+                        <option value="Unknown Device">Unknown Device</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Requested Action</label>
+                    <select name="requested_action" class="form-control" required>
+                        <option value="view_record">View Record</option>
+                        <option value="update_record">Update Record</option>
+                        <option value="delete_record">Delete Record</option>
+                        <option value="manage_users">Manage Users</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Request Count</label>
+                    <input type="number" name="request_count" class="form-control" value="1" required>
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Request Content</label>
+                    <input type="text" name="user_input" class="form-control"
+                        placeholder="Enter normal or suspicious input" required>
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Simulated IP Address (optional)</label>
+                    <input type="text" name="simulated_ip" class="form-control"
+                        placeholder="Leave blank to use local IP">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Verify and Access Patient Data</button>
+        </form>
+
+        {% if result %}
+        <hr>
+
+        <div class="alert alert-{{ 'success' if result.decision == 'Allow' else 'danger' }}">
+            <strong>Decision:</strong> {{ result.decision }}
+        </div>
+
+        <p><strong>Patient ID:</strong> {{ result.patient_id }}</p>
+        <p><strong>Device:</strong> {{ result.device_name }}</p>
+        <p><strong>IP Address:</strong> {{ result.ip_address }}</p>
+        <p><strong>Requested Action:</strong> {{ result.requested_action }}</p>
+        <p><strong>Attack Type:</strong> {{ result.attack_type }}</p>
+        <p><strong>Reason:</strong> {{ result.reason }}</p>
+
+        {% if displayed_patient %}
+        <h4 class="mt-4">Displayed Patient Data</h4>
+        <div class="alert alert-info">
+            <strong>Name:</strong> {{ displayed_patient.name }}<br>
+            <strong>Age:</strong> {{ displayed_patient.age }}<br>
+            <strong>Diagnosis:</strong> {{ displayed_patient.diagnosis }}<br>
+            <strong>Heart Rate:</strong> {{ displayed_patient.heart_rate }}<br>
+            <strong>Notes:</strong> {{ displayed_patient.notes }}
+        </div>
+
+        <h5>Encrypted Patient Data</h5>
+        <div class="alert alert-warning" style="word-break: break-all;">
+            {{ encrypted_data }}
+        </div>
+
+        <h5>Decrypted Patient Data</h5>
+        <div class="alert alert-success" style="white-space: pre-line;">
+            {{ decrypted_data }}
+        </div>
+        {% endif %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

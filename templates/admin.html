@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h2>Admin Management</h2>
+        <p>This page allows Admin to manage trusted IPs, trusted devices, and review users.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4>Add Trusted IP</h4>
+                <form method="POST">
+                    <div class="mb-3">
+                        <input type="text" name="new_ip" class="form-control" placeholder="Enter new trusted IP">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add IP</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4>Trusted IPs</h4>
+                <ul class="list-group">
+                    {% for ip in trusted_ips %}
+                    <li class="list-group-item">{{ ip }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4>Add Trusted Device</h4>
+                <form method="POST">
+                    <div class="mb-3">
+                        <input type="text" name="new_device" class="form-control"
+                            placeholder="Enter new trusted device">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Device</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4>Trusted Devices</h4>
+                <ul class="list-group">
+                    {% for device in trusted_devices %}
+                    <li class="list-group-item">{{ device }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h4>System Users</h4>
+        <ul class="list-group">
+            {% for username, info in users.items() %}
+            <li class="list-group-item">
+                <strong>{{ username }}</strong> — {{ info.role }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

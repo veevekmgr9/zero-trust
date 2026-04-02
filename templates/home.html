@@ -1,6 +1,27 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h2>Zero Trust Hospital Management System</h2>
-<p>This system secures healthcare infrastructure using Zero Trust Architecture.</p>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2>Zero Trust Hospital Management System</h2>
+        <p>
+            This prototype secures healthcare infrastructure using Zero Trust Architecture,
+            encryption, intrusion detection, and activity monitoring.
+        </p>
+
+        <div class="alert alert-primary mt-3">
+            <strong>Key Principle:</strong> No user, device, or request is trusted by default.
+            Every sensitive request is verified each time before access is granted.
+        </div>
+
+        <h4 class="mt-4">System Modules</h4>
+        <ul>
+            <li>Role-based login for Admin, Doctor, and Nurse</li>
+            <li>Zero Trust verification on patient-data requests</li>
+            <li>IoT device verification</li>
+            <li>Patient data encryption</li>
+            <li>Intrusion detection and security logging</li>
+        </ul>
+    </div>
+</div>
 {% endblock %}

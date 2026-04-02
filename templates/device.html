@@ -3,9 +3,93 @@
 {% block content %}
 <div class="card shadow-sm">
     <div class="card-body">
-        <h2>IoT Devices</h2>
-        <p>This section will contain device verification and access.</p>
+        <h2>IoT Device Access Verification</h2>
+        <p>Each IoT device request must pass Zero Trust verification before connection data is shown.</p>
+
         <p><strong>Logged in role:</strong> {{ role }}</p>
+
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Select Device</label>
+                    <select name="device_name" class="form-control" required>
+                        {% for device_name, device in devices.items() %}
+                        <option value="{{ device_name }}">{{ device_name }} - {{ device.device_id }}</option>
+                        {% endfor %}
+                        <option value="Unknown Device">Unknown Device</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Requested Action</label>
+                    <select name="requested_action" class="form-control" required>
+                        <option value="view_record">View Device Data</option>
+                        <option value="update_record">Update Device Data</option>
+                        <option value="manage_devices">Manage Devices</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Request Count</label>
+                    <input type="number" name="request_count" class="form-control" value="1" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Simulated IP Address (optional)</label>
+                    <input type="text" name="simulated_ip" class="form-control"
+                        placeholder="Leave blank to use local IP">
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Request Content</label>
+                    <input type="text" name="user_input" class="form-control"
+                        placeholder="Enter normal or suspicious input" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Verify Device Request</button>
+        </form>
+
+        {% if result %}
+        <hr>
+
+        <div class="alert alert-{{ 'success' if result.decision == 'Allow' else 'danger' }}">
+            <strong>Decision:</strong> {{ result.decision }}
+        </div>
+
+        <p><strong>Device:</strong> {{ result.device_name }}</p>
+        <p><strong>IP Address:</strong> {{ result.ip_address }}</p>
+        <p><strong>Requested Action:</strong> {{ result.requested_action }}</p>
+        <p><strong>Attack Type:</strong> {{ result.attack_type }}</p>
+        <p><strong>Reason:</strong> {{ result.reason }}</p>
+
+        {% if displayed_device %}
+        <h4 class="mt-4">Connected IoT Device Data</h4>
+        <div class="alert alert-info">
+            <strong>Device ID:</strong> {{ displayed_device.device_id }}<br>
+            <strong>Status:</strong> {{ displayed_device.status }}<br>
+            <strong>Patient ID:</strong> {{ displayed_device.patient_id }}<br>
+            <strong>Last Reading:</strong> {{ displayed_device.last_reading }}
+        </div>
+
+        {% if linked_patient %}
+        <div class="alert alert-secondary">
+            <strong>Linked Patient:</strong> {{ linked_patient.name }}<br>
+            <strong>Diagnosis:</strong> {{ linked_patient.diagnosis }}
+        </div>
+        {% endif %}
+
+        <h5>Encrypted Device Data</h5>
+        <div class="alert alert-warning" style="word-break: break-all;">
+            {{ encrypted_device_data }}
+        </div>
+
+        <h5>Decrypted Device Data</h5>
+        <div class="alert alert-success" style="white-space: pre-line;">
+            {{ decrypted_device_data }}
+        </div>
+        {% endif %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

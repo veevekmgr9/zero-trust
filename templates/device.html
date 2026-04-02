@@ -19,6 +19,16 @@
                         <option value="Unknown Device">Unknown Device</option>
                     </select>
                 </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Select Patient</label>
+                    <select name="patient_id" class="form-control" required>
+                        {% for patient_id, patient in patients.items() %}
+                        <option value="{{ patient_id }}">
+                            {{ patient_id }} - {{ patient.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Requested Action</label>

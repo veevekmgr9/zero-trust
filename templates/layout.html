@@ -18,7 +18,9 @@
                 <a class="btn btn-outline-light btn-sm me-2" href="/patient">Patient</a>
                 <a class="btn btn-outline-light btn-sm me-2" href="/device">Device</a>
                 <a class="btn btn-outline-light btn-sm me-2" href="/logs">Logs</a>
-
+                {% if session.get('role') == 'Admin' %}
+                <a class="btn btn-outline-light btn-sm me-2" href="/admin">Admin</a>
+                {% endif %}
                 {% if session.get('username') %}
                 <a class="btn btn-warning btn-sm" href="/logout">Logout</a>
                 {% else %}

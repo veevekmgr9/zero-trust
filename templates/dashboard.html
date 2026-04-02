@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="card shadow-sm">
+<div class="card shadow-sm mb-4">
     <div class="card-body">
         <h2>Dashboard</h2>
         <p><strong>User:</strong> {{ username }}</p>
@@ -13,13 +13,51 @@
         </div>
         {% elif role == "Doctor" %}
         <div class="alert alert-success">
-            Doctor can access and update patient records based on Zero Trust verification.
+            Doctor can access and update patient records after Zero Trust verification.
         </div>
         {% elif role == "Nurse" %}
         <div class="alert alert-info">
-            Nurse can access limited patient information based on Zero Trust verification.
+            Nurse can access limited patient information after Zero Trust verification.
         </div>
         {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center mb-3">
+            <div class="card-body">
+                <h5>Total Requests</h5>
+                <h3>{{ total_requests }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center mb-3">
+            <div class="card-body">
+                <h5>Allowed</h5>
+                <h3>{{ allowed_requests }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center mb-3">
+            <div class="card-body">
+                <h5>Denied</h5>
+                <h3>{{ denied_requests }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center mb-3">
+            <div class="card-body">
+                <h5>Detected Attacks</h5>
+                <h3>{{ detected_attacks }}</h3>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

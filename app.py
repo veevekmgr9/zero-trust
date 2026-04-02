@@ -209,10 +209,31 @@ def dashboard():
         flash("Please log in first.", "warning")
         return redirect(url_for("login"))
 
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM security_logs")
+    total_requests = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM security_logs WHERE decision='Allow'")
+    allowed_requests = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM security_logs WHERE decision='Deny'")
+    denied_requests = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM security_logs WHERE attack_type!='Normal'")
+    detected_attacks = cursor.fetchone()[0]
+
+    conn.close()
+
     return render_template(
         "dashboard.html",
         username=session["username"],
-        role=session["role"]
+        role=session["role"],
+        total_requests=total_requests,
+        allowed_requests=allowed_requests,
+        denied_requests=denied_requests,
+        detected_attacks=detected_attacks
     )
 
 
@@ -315,6 +336,7 @@ def device():
         requested_action = request.form["requested_action"]
         request_count = int(request.form["request_count"])
         user_input = request.form["user_input"]
+        patient_id = request.form.get("patient_id")
 
         simulated_ip = request.form.get("simulated_ip", "").strip()
         ip_address = simulated_ip if simulated_ip else request.remote_addr
@@ -332,8 +354,7 @@ def device():
 
         if decision == "Allow" and device_name in IOT_DEVICES:
             displayed_device = IOT_DEVICES[device_name]
-            patient_id = displayed_device["patient_id"]
-            linked_patient = PATIENTS.get(patient_id)
+            patient_id = PATIENTS.get(patient_id)
 
             device_text = f"""
 Device Name: {device_name}
@@ -374,10 +395,10 @@ Last Reading: {displayed_device['last_reading']}
         role=session["role"],
         result=result,
         displayed_device=displayed_device,
-        linked_patient=linked_patient,
         encrypted_device_data=encrypted_device_data,
         decrypted_device_data=decrypted_device_data,
-        devices=IOT_DEVICES
+        devices=IOT_DEVICES,
+        patients=PATIENTS
     )
 
 @app.route("/logs")
@@ -403,6 +424,55 @@ def logs():
 
     return render_template("logs.html", role=session["role"], logs_data=logs_data)
 
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    if "username" not in session:
+        flash("Please log in first.", "warning")
+        return redirect(url_for("login"))
+
+    if session["role"] != "Admin":
+        flash("Access denied. Admin only.", "danger")
+        return redirect(url_for("dashboard"))
+
+    if request.method == "POST":
+        new_ip = request.form.get("new_ip", "").strip()
+        new_device = request.form.get("new_device", "").strip()
+
+        if new_ip:
+            if new_ip not in TRUSTED_IPS:
+                TRUSTED_IPS.append(new_ip)
+                flash(f"Trusted IP added: {new_ip}", "success")
+            else:
+                flash("IP already exists in trusted list.", "info")
+
+        if new_device:
+            patient_id = request.form.get("patient_id", "").strip()
+            device_status = request.form.get("device_status", "").strip() or "Connected"
+            last_reading = request.form.get("last_reading", "").strip() or "No reading available yet"
+
+            if new_device not in TRUSTED_DEVICES:
+                TRUSTED_DEVICES.append(new_device)
+
+                IOT_DEVICES[new_device] = {
+                    "device_id": f"D{len(IOT_DEVICES) + 1:03}",
+                    "patient_id": patient_id,
+                    "status": device_status,
+                    "last_reading": last_reading
+                }
+
+                flash(f"Trusted device added: {new_device}", "success")
+            else:
+                flash("Device already exists in trusted list.", "info")
+
+        return redirect(url_for("admin"))
+
+    return render_template(
+        "admin.html",
+        trusted_ips=TRUSTED_IPS,
+        trusted_devices=TRUSTED_DEVICES,
+        users=USERS,
+        patient=PATIENTS,
+    )
 
 if __name__ == "__main__":
     init_db()

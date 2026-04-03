@@ -45,22 +45,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Assign Patient</label>
-                        <select name="patient_id" class="form-control">
-                            {% for patient_id, patient in patients.items() %}
-                            <option value="{{ patient_id }}">{{ patient_id }} - {{ patient.name }}</option>
-                            {% endfor %}
-                        </select>
+                        <input type="text" name="serial_number" class="form-control"
+                            placeholder="Enter device serial number">
                     </div>
 
                     <div class="mb-3">
                         <input type="text" name="device_status" class="form-control" placeholder="Enter device status"
                             value="Connected">
-                    </div>
-
-                    <div class="mb-3">
-                        <input type="text" name="last_reading" class="form-control" placeholder="Enter last reading"
-                            value="No reading available yet">
                     </div>
 
                     <button type="submit" class="btn btn-primary">Add Device</button>

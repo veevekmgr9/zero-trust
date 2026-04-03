@@ -54,20 +54,26 @@ IOT_DEVICES = {
     }
 }
 # Trusted devices
-TRUSTED_DEVICES = [
-    "Heart Monitor",
-    "Wearable Sensor",
-    "Nurse Tablet",
-    "Admin Workstation",
-    "Smart Infusion Pump"
-]
+conn = sqlite3.connect("database.db")
+cursor = conn.cursor()
+
+cursor.execute("SELECT device_name, device_id, device_serial_number, device_status FROM trusted_devices")
+rows = cursor.fetchall()
+
+cursor.execute("SELECT ip FROM trusted_ips")
+ips = cursor.fetchall()
+
+ip = [row[0] for row in ips]
+
+devices = [row[0] for row in rows]
+
+print(f"Loaded trusted devices from database: {devices}")
+
+conn.close()
+TRUSTED_DEVICES = devices
 
 # Trusted IPs
-TRUSTED_IPS = [
-    "127.0.0.1",
-    "192.168.1.10",
-    "192.168.1.11"
-]
+TRUSTED_IPS = ip
 
 # Role permissions
 ROLE_PERMISSIONS = {
@@ -95,6 +101,25 @@ def init_db():
             attack_type TEXT,
             decision TEXT,
             reason TEXT
+        )
+    """)
+
+    # Trusted IPs
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS trusted_ips (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ip TEXT UNIQUE
+        )
+    """)
+
+    # Trusted Devices
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS trusted_devices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            device_name TEXT UNIQUE,
+            device_id TEXT,
+            device_serial_number TEXT,
+            device_status TEXT
         )
     """)
 
@@ -326,6 +351,22 @@ def patient():
             "reason": reason
         }
 
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT device_name, device_id, device_serial_number, device_status FROM trusted_devices")
+    rows = cursor.fetchall()
+
+    devices = {}
+    for row in rows:
+        devices[row[0]] = {
+            "device_id": row[1],
+            "serial_number": row[2],
+            "status": row[3],
+        }
+
+    conn.close()
+
     return render_template(
         "patient.html",
         role=session["role"],
@@ -333,6 +374,7 @@ def patient():
         encrypted_data=encrypted_data,
         decrypted_data=decrypted_data,
         displayed_patient=displayed_patient,
+        devices=devices,
         patients=PATIENTS
     )
 
@@ -408,6 +450,22 @@ Last Reading: {displayed_device['last_reading']}
             "reason": reason
         }
 
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT device_name, device_id, device_serial_number, device_status FROM trusted_devices")
+    rows = cursor.fetchall()
+
+    devices = {}
+    for row in rows:
+        devices[row[0]] = {
+            "device_id": row[1],
+            "serial_number": row[2],
+            "status": row[3],
+        }
+
+    conn.close()
     return render_template(
         "device.html",
         role=session["role"],
@@ -415,7 +473,7 @@ Last Reading: {displayed_device['last_reading']}
         displayed_device=displayed_device,
         encrypted_device_data=encrypted_device_data,
         decrypted_device_data=decrypted_device_data,
-        devices=IOT_DEVICES,
+        devices=devices,
         patients=PATIENTS
     )
 
@@ -458,36 +516,64 @@ def admin():
 
         if new_ip:
             if new_ip not in TRUSTED_IPS:
-                TRUSTED_IPS.append(new_ip)
+                conn = sqlite3.connect("database.db")
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO trusted_ips (ip) VALUES (?)", (new_ip,))
+                conn.commit()
+                conn.close()
                 flash(f"Trusted IP added: {new_ip}", "success")
             else:
                 flash("IP already exists in trusted list.", "info")
 
         if new_device:
-            patient_id = request.form.get("patient_id", "").strip()
+            serial_number = request.form.get("serial_number", "").strip()
             device_status = request.form.get("device_status", "").strip() or "Connected"
-            last_reading = request.form.get("last_reading", "").strip() or "No reading available yet"
 
             if new_device not in TRUSTED_DEVICES:
-                TRUSTED_DEVICES.append(new_device)
+                conn = sqlite3.connect("database.db")
+                cursor = conn.cursor()
 
-                IOT_DEVICES[new_device] = {
-                    "device_id": f"D{len(IOT_DEVICES) + 1:03}",
-                    "patient_id": patient_id,
-                    "status": device_status,
-                    "last_reading": last_reading
-                }
+                cursor.execute("""
+                    INSERT INTO trusted_devices (device_name, device_id, device_serial_number, device_status)
+                    VALUES (?, ?, ?, ?)
+                """, (
+                    new_device,
+                    f"D{len(IOT_DEVICES) + 1:03}",
+                    serial_number,
+                    device_status,
+                ))
+
+                conn.commit()
+                conn.close()
 
                 flash(f"Trusted device added: {new_device}", "success")
             else:
                 flash("Device already exists in trusted list.", "info")
 
         return redirect(url_for("admin"))
+    
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT ip FROM trusted_ips")
+    trusted_ip = [row[0] for row in cursor.fetchall()]
+
+    cursor.execute("SELECT device_name, device_id, device_serial_number, device_status FROM trusted_devices")
+    rows = cursor.fetchall()
+
+    devices = {}
+    for row in rows:
+        devices[row[0]] = {
+            "device_id": row[1],
+            "device_serial_number": row[2],
+            "device_status": row[3],
+        }
+
+    conn.close()
 
     return render_template(
         "admin.html",
-        trusted_ips=TRUSTED_IPS,
-        trusted_devices=TRUSTED_DEVICES,
+        trusted_ips=trusted_ip,
+        trusted_devices=devices,
         users=USERS,
         patients=PATIENTS,
     )

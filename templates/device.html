@@ -14,7 +14,8 @@
                     <label class="form-label">Select Device</label>
                     <select name="device_name" class="form-control" required>
                         {% for device_name, device in devices.items() %}
-                        <option value="{{ device_name }}">{{ device_name }} - {{ device.device_id }}</option>
+                        <option value="{{ device_name }}">{{ device_name }}({{ device.serial_number }}) - {{
+                            device.device_id }}</option>
                         {% endfor %}
                         <option value="Unknown Device">Unknown Device</option>
                     </select>

@@ -22,11 +22,11 @@
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Device Name</label>
                     <select name="device_name" class="form-control" required>
-                        <option value="Heart Monitor">Heart Monitor</option>
-                        <option value="Wearable Sensor">Wearable Sensor</option>
-                        <option value="Nurse Tablet">Nurse Tablet</option>
-                        <option value="Admin Workstation">Admin Workstation</option>
-                        <option value="Smart Infusion Pump">Smart Infusion Pump</option>
+                        {% for device_name, device in devices.items() %}
+                        <option value="{{ device_name }}">
+                            {{ device_name }}({{ device.serial_number }}) - {{ device.device_id }}
+                        </option>
+                        {% endfor %}
                         <option value="Unknown Device">Unknown Device</option>
                     </select>
                 </div>
